@@ -1,8 +1,14 @@
-.container {
+body {
   padding: 1rem;
   background-color: aquamarine;
 }
 
 .card-content {
   padding: 1rem;
+}
+
+.routine {
+  border: black;
+  padding-top: 1rem;
+  line-height: 3px;
 }

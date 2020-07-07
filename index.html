@@ -14,43 +14,47 @@
       <div class="col-12">
         <div id="main" class="card">
           <div class="card-content">
-            <span class="card-title">Sign In Below</span>
             <div class="row">
-              <form action="" id="sign-in">
-                <div class="input-field col-6">
-                  <input type="text" name="name" id="name" placeholder="name">
-                </div>
-                <div class="input-field col-6">
-                  <input type="text" name="email" id="email" placeholder="email">
-                </div>
-                <button type="button" id="sign-in" class="btn btn-link">Sign In</button>
-                <button type="button" class="btn btn-link" data-toggle="modal" data-target="#sign-up-form">
-                  Sign Up
+              <button type="button" id="show-routines" class="btn btn-link">Show Routines</button>
+                <button type="button" class="btn btn-link" data-toggle="modal" data-target="#create-routines">
+                  Create Routines
                 </button>
-              </form>
             </div>
           </div>
         </div>
-        <div class="modal fade" id="sign-up-form" tabindex="-1" role="dialog" aria-labelledby="signUpModal" aria-hidden="true">
+        <div id="routine-container">
+          
+        </div>
+        <div class="modal fade" id="create-routines" tabindex="-1" role="dialog" aria-labelledby="signUpModal" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="ModalLabel">Create Profile</h5>
+                <h5 class="modal-title" id="ModalLabel">Create Routine</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
               <div class="modal-body">
-                <div class="input-field col-6">
-                  <input type="text" name="name" id="name" placeholder="name">
-                </div>
-                <div class="input-field col-6">
-                  <input type="text" name="name" id="email" placeholder="email">
-                </div>
+                <form>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
+                    </div>
+                    <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
+                      <option selected>Exercise List</option>
+                      <option value="Pushups">Pushups</option>
+                      <option value="Pullups">Pullups</option>
+                      <option value="Sit Ups">Sit Ups</option>
+                      <option value="Squats">Squats</option>
+                      <option value="Lunges">Lunges</option>
+                      <option value="Calf Raises">Calf Raises</option>
+                    </select>
+                  </div>
+                </form>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" id="save-changes" class="btn btn-primary">Save changes</button>
               </div>
             </div>
           </div>
