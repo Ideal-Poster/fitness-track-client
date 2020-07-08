@@ -36,25 +36,15 @@
               </div>
               <div class="modal-body">
                 <form>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
-                    </div>
-                    <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
-                      <option selected>Exercise List</option>
-                      <option value="Pushups">Pushups</option>
-                      <option value="Pullups">Pullups</option>
-                      <option value="Sit Ups">Sit Ups</option>
-                      <option value="Squats">Squats</option>
-                      <option value="Lunges">Lunges</option>
-                      <option value="Calf Raises">Calf Raises</option>
-                    </select>
+                  <div class="form-group">
+                    <label for="Create">Name</label>
+                    <input type="text" class="form-control" id="create" placeholder="Routine Name">
                   </div>
                 </form>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" id="save-changes" class="btn btn-primary">Save changes</button>
+                <button type="button" id="new-routine" class="btn btn-primary">New Routine</button>
               </div>
             </div>
           </div>
