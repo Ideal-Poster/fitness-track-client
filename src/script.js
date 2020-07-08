@@ -8,7 +8,7 @@ const createRoutineForm = modal.querySelector(".new-routine-form")
 const exerciseList = document.querySelector('#exercise-list')
 const selectButton = document.querySelector('#exercise-select')
 const routineNameInput = document.querySelector('#create')
-
+const conatiner = document.querySelector(".container")
 
 
 getRoutines = callback => {
@@ -17,7 +17,6 @@ getRoutines = callback => {
     .then(json => renderRoutineList(json))
     .catch(error => console.log('error', error));
 }
-
 
 renderRoutineList = json => {
   json.forEach(item => {
@@ -35,21 +34,23 @@ renderRoutineList = json => {
             `)
           })}
           <form>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
-                    </div>
-                    <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
-                      <option selected>Exercise List</option>
-                      <option value="Pushups">Pushups</option>
-                      <option value="Pullups">Pullups</option>
-                      <option value="Sit Ups">Sit Ups</option>
-                      <option value="Squats">Squats</option>
-                      <option value="Lunges">Lunges</option>
-                      <option value="Calf Raises">Calf Raises</option>
-                    </select>
-                  </div>
-                </form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
+              </div>
+              <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
+                <option selected>Exercise List</option>
+                <option value="Pushups">Pushups</option>
+                <option value="Pullups">Pullups</option>
+                <option value="Sit Ups">Sit Ups</option>
+                <option value="Squats">Squats</option>
+                <option value="Lunges">Lunges</option>
+                <option value="Calf Raises">Calf Raises</option>
+              </select>
+            </div>
+          </form>
+          <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
+
         </div>
         
       </div>
@@ -86,6 +87,7 @@ renderRoutine = routine => {
             </select>
           </div>
         </form>
+        <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
     </div>
   </div>
   `
@@ -105,10 +107,30 @@ postRoutine = (name, callback) => {
     .catch(error => console.log('error', error));
 }
 
+deleteRoutine = id => {
+  var requestOptions = {
+    method: 'DELETE',
+    headers: { "Content-Type": "application/json" }
+  };
+  fetch(`${BASE_URL}/routines/${id}`, requestOptions)
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
+    document.querySelector(`.card-${id}`).remove()
+}
+
+
 modal.addEventListener('click', e => {
   if (e.target.matches('#new-routine')) {
     let routineName = routineNameInput.value
     postRoutine(routineName, renderRoutine)
+  }
+})
+
+conatiner.addEventListener("click", e => {
+  if (e.target.matches(".delete-btn")) {
+  const id = e.target.closest(".card").dataset.routineId
+  deleteRoutine(id)
+    
   }
 })
 
