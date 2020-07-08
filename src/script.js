@@ -75,15 +75,17 @@ renderRoutineList = json => {
 // })
 
 newRoutine.addEventListener('click', e => {
-  let routineName = document.querySelector('#create').value
+  let routineNameInput = document.querySelector('#create')
+  let routineName = routineNameInput.value
+  routineNameInput.closest("form").reset()
   const newRoutineCard = document.createElement('div')
   newRoutineCard.classList = "routine"
   newRoutineCard.innerHTML = `
   <div class="card">
-  <h3 class="card-header">${routineName}</h3
-  <div class="card-body">
-  <form>
-                  <div class="input-group mb-3">
+    <h3 class="card-header">${routineName}</h3>
+      <div class="card-body">
+        <form>
+             <div class="input-group mb-3">
                     <div class="input-group-prepend">
                       <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
                     </div>
@@ -99,7 +101,8 @@ newRoutine.addEventListener('click', e => {
                   </div>
                 </form>
   </div>
-  </div>`
+  </div>
+  `
   routineContainer.append(newRoutineCard)
 })
 
