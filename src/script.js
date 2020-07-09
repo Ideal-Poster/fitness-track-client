@@ -183,8 +183,8 @@ renderExercise = (json) => {
   exercises_container.innerHTML += `
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">${exercises[json.exercise_id].name}</h5>
-        <p class="card-text">muscle group: ${exercises[json.exercise_id].muscle_group}</p>
+        <h5 class="card-title">${exercises[json.exercise_id - 1].name}</h5>
+        <p class="card-text">muscle group: ${exercises[json.exercise_id - 1].muscle_group}</p>
         <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
       </div>
     </div>
