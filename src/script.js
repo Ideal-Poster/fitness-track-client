@@ -37,38 +37,40 @@ renderRoutineList = json => {
     routineItem.innerHTML = `
       <div class="card card-${routine.id}" data-id="${routine.id}">
         <h3 class="card-header">${routine.name}
-        <button type="button" class="btn btn-outline-dark open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
+          <button type="button" class="btn btn-outline-dark open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
         </h3>
-        <div class="card-body"> 
+        <div class="card-body"><div>
           ${routine.exercises.map(exercise => {            
             return(`
-              <h5 class="card-title">${exercise.name}</h5>
-              <h5 class="card-title">muscle group: ${exercise.muscle_group}</h5>
-              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">${exercise.name}</h5>
+                <p class="card-text">muscle group: ${exercise.muscle_group}</p>
+                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+              </div>
+            </div>
             `)
           })}
-          <form>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
-              </div>
-              <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
-                ${exercises.map(exercise => {
-                  return `<option value="${exercise.id}">${exercise.name}</option>`
-                })}
-              </select>
-            </div>
-          </form>
-          <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
-
         </div>
-        
-      </div>
+
+        <form>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
+            </div>
+            <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
+              ${exercises.map(exercise => {
+                return `<option value="${exercise.id}">${exercise.name}</option>`
+              })}
+            </select>
+          </div>
+        </form>
+        <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
+      </div>  
+    </div>
     `
     routineContainer.appendChild(routineItem)
     
-    
-  
     container.addEventListener('click', e => {
       if (e.target.matches('.open-edit-modal')) {
       editModal.dataset.id = e.target.closest(".card").dataset.id
@@ -85,7 +87,7 @@ renderRoutine = routine => {
   newRoutineCard.innerHTML = `
   <div class="card card-${routine.id}" data-id="${routine.id}">
     <h3 class="card-header">${routine.name}
-    <button type="button" class="btn btn-outline-dark open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
+      <button type="button" class="btn btn-outline-dark open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
     </h3>
       <div class="card-body">
         <form>
@@ -138,7 +140,6 @@ deleteRoutine = id => {
     document.querySelector(`.card-${id}`).parentNode.remove()
 }
 
-
 patchRoutine = (id, name, callback) => {
   var requestOptions = {
     method: 'PATCH',
@@ -151,7 +152,7 @@ patchRoutine = (id, name, callback) => {
     .catch(error => console.log('error', error));
 }
 
-addExerciseToRoutine = (routineId, exerciseId) => {
+postExerciseToRoutine = (routineId, exerciseId, callback) => {
   var requestOptions = {
     method: 'POST',
     headers:{
@@ -165,12 +166,28 @@ addExerciseToRoutine = (routineId, exerciseId) => {
 
   fetch("http://localhost:3000/api/v1/exercise_routines", requestOptions)
     .then(res => res.json())
-    .then(json => console.log(json))
+    .then(json => {
+      console.log(json);
+      
+      callback(json)
+    })
     .catch(error => console.log('error', error));
 }
 
 renderExercise = (json) => {
-  const card = container.querySelector(`card-${json.id}`)
+  console.log(exercises);
+  
+  const card = container.querySelector(`.card-${json.routine_id}`)
+  const exercises_container = card.querySelector(".card-body").firstElementChild
+  exercises_container.innerHTML += `
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">${exercises[json.exercise_id].name}</h5>
+        <p class="card-text">muscle group: ${exercises[json.exercise_id].muscle_group}</p>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+      </div>
+    </div>
+  `
   // card.querySelector().
 }
 
@@ -181,7 +198,6 @@ modal.addEventListener('click', e => {
     postRoutine(routineName, renderRoutine)
   }
 })
-
 
 editModal.addEventListener('click', e => {
   if (e.target.matches('#edit-routine')) {
@@ -194,13 +210,13 @@ editModal.addEventListener('click', e => {
 
 container.addEventListener("click", e => {
   if (e.target.matches(".delete-btn")) {
-    const id = e.target.closest(".card").dataset.id
-    deleteRoutine(id)
+    const id = e.target.closest(".card").dataset.id;
+    deleteRoutine(id);
   } else if (e.target.matches("#exercise-select")) {
-    const select_value = e.target.closest(".input-group-prepend").nextElementSibling.value
-    const routine_id = e.target.closest(".card").dataset.id
+    const routine_id = e.target.closest(".card").dataset.id;
+    const select_value = e.target.closest(".input-group-prepend").nextElementSibling.value;
     console.log(select_value, routine_id);
-    
+    postExerciseToRoutine(routine_id, select_value, renderExercise);
   }
 })
 
