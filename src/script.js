@@ -36,9 +36,8 @@ renderRoutineList = json => {
     routineItem.className = "routine"
     routineItem.innerHTML = `
       <div class="card card-${routine.id}" data-id="${routine.id}">
-        <h3 class="card-header">${routine.name}
-          <button type="button" class="btn btn-outline-dark open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
-        </h3>
+        <h3 class="card-header">${routine.name}</h3>
+          <button type="button" class="btn btn-outline-primary btn-sm open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
         <div class="card-body"><div>
           ${routine.exercises.map(exercise => {            
             return(`
@@ -52,7 +51,7 @@ renderRoutineList = json => {
             `)
           })}
         </div>
-
+      <div class="card-footer">
         <form>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -86,10 +85,11 @@ renderRoutine = routine => {
   newRoutineCard.classList = "routine"
   newRoutineCard.innerHTML = `
   <div class="card card-${routine.id}" data-id="${routine.id}">
-    <h3 class="card-header">${routine.name}
-      <button type="button" class="btn btn-outline-dark open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
-    </h3>
+    <h3 class="card-header">${routine.name}</h3>
+      <button type="button" class="btn btn-outline-primary btn-sm open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
       <div class="card-body">
+      </div>
+      <div class="card-footer">
         <form>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -116,6 +116,7 @@ renderRoutine = routine => {
   })
 }
 
+
 postRoutine = (name, callback) => {
   var requestOptions = {
     method: 'POST',
@@ -140,7 +141,7 @@ deleteRoutine = id => {
     document.querySelector(`.card-${id}`).parentNode.remove()
 }
 
-patchRoutine = (id, name, callback) => {
+patchRoutine = (id, name) => {
   var requestOptions = {
     method: 'PATCH',
     headers: { "Content-Type": "application/json" },
@@ -148,7 +149,7 @@ patchRoutine = (id, name, callback) => {
   };
   fetch(`${BASE_URL}routines/${id}`, requestOptions)
     .then(res => res.json())
-    .then(json => callback(json))
+    .then(json => console.log(json))
     .catch(error => console.log('error', error));
 }
 
@@ -203,8 +204,9 @@ editModal.addEventListener('click', e => {
   if (e.target.matches('#edit-routine')) {
     let id = editModal.dataset.id
     let newRoutineName = newRoutineNameInput.value
-    container.querySelector(`.card-${id}`).parentNode.remove()
-    patchRoutine(id, newRoutineName, renderRoutine)
+    const titleTarget = container.querySelector(`.card-${id}`).firstElementChild
+    titleTarget.textContent = newRoutineName
+    patchRoutine(id, newRoutineName)
   }
 })
 
