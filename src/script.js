@@ -10,23 +10,33 @@ const selectButton = document.querySelector('#exercise-select')
 const routineNameInput = document.querySelector('#create')
 const conatiner = document.querySelector(".container")
 
+let exercises = []
 
 getRoutines = callback => {
+  getExercises()
+
   fetch("http://localhost:3000/api/v1/routines")
     .then(res => res.json())
     .then(json => renderRoutineList(json))
     .catch(error => console.log('error', error));
 }
 
+getExercises = () => {
+  fetch("http://localhost:3000/api/v1/exercises")
+    .then(res => res.json())
+    .then(json => exercises = json)
+    .catch(error => console.log('error', error));
+}
+
 renderRoutineList = json => {
-  json.forEach(item => {
+  json.forEach(routine => {
     let routineItem = document.createElement('div')
     routineItem.className = "routine"
     routineItem.innerHTML = `
-      <div class="card card-${item.id}" data-routine-id="${item.id}">
-        <h3 class="card-header">${item.name}</h3>
+      <div class="card card-${routine.id}" data-id="${routine.id}">
+        <h3 class="card-header">${routine.name}</h3>
         <div class="card-body"> 
-          ${item.exercises.map(exercise => {            
+          ${routine.exercises.map(exercise => {            
             return(`
               <h5 class="card-title">${exercise.name}</h5>
               <h5 class="card-title">muscle group: ${exercise.muscle_group}</h5>
@@ -39,13 +49,9 @@ renderRoutineList = json => {
                 <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
               </div>
               <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
-                <option selected>Exercise List</option>
-                <option value="Pushups">Pushups</option>
-                <option value="Pullups">Pullups</option>
-                <option value="Sit Ups">Sit Ups</option>
-                <option value="Squats">Squats</option>
-                <option value="Lunges">Lunges</option>
-                <option value="Calf Raises">Calf Raises</option>
+                ${exercises.map(exercise => {
+                  return `<option value="${exercise.id}">${exercise.name}</option>`
+                })}
               </select>
             </div>
           </form>
@@ -59,16 +65,12 @@ renderRoutineList = json => {
   })
 }
 
-// selectButton.addEventListener('click', e => {
-//   console.log('click')
-// })
-
 renderRoutine = routine => {
   routineNameInput.closest("form").reset()
   const newRoutineCard = document.createElement('div')
   newRoutineCard.classList = "routine"
   newRoutineCard.innerHTML = `
-  <div class="card card-${routine.id}" data-routine-id="${routine.id}">
+  <div class="card card-${routine.id}" data-id="${routine.id}">
     <h3 class="card-header">${routine.name}</h3>
       <div class="card-body">
         <form>
@@ -76,14 +78,11 @@ renderRoutine = routine => {
             <div class="input-group-prepend">
               <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
             </div>
+            
             <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
-              <option selected>Exercise List</option>
-              <option value="Pushups">Pushups</option>
-              <option value="Pullups">Pullups</option>
-              <option value="Sit Ups">Sit Ups</option>
-              <option value="Squats">Squats</option>
-              <option value="Lunges">Lunges</option>
-              <option value="Calf Raises">Calf Raises</option>
+              ${exercises.map(exercise => {
+                return `<option value="${exercise.id}">${exercise.name}</option>`
+              })}
             </select>
           </div>
         </form>
@@ -118,6 +117,29 @@ deleteRoutine = id => {
     document.querySelector(`.card-${id}`).remove()
 }
 
+addExerciseToRoutine = (routineId, exerciseId) => {
+  var requestOptions = {
+    method: 'POST',
+    headers:{
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "routine_id": routineId,
+      "exercise_id": exerciseId
+    })
+  };
+
+  fetch("http://localhost:3000/api/v1/exercise_routines", requestOptions)
+    .then(res => res.json())
+    .then(json => console.log(json))
+    .catch(error => console.log('error', error));
+}
+
+renderExercise = (json) => {
+  const card = container.querySelector(`card-${json.id}`)
+  // card.querySelector().
+}
+
 
 modal.addEventListener('click', e => {
   if (e.target.matches('#new-routine')) {
@@ -128,8 +150,12 @@ modal.addEventListener('click', e => {
 
 conatiner.addEventListener("click", e => {
   if (e.target.matches(".delete-btn")) {
-  const id = e.target.closest(".card").dataset.routineId
-  deleteRoutine(id)
+    const id = e.target.closest(".card").dataset.id
+    deleteRoutine(id)
+  } else if (e.target.matches("#exercise-select")) {
+    const select_value = e.target.closest(".input-group-prepend").nextElementSibling.value
+    const routine_id = e.target.closest(".card").dataset.id
+    console.log(select_value, routine_id);
     
   }
 })
