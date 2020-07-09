@@ -4,11 +4,13 @@ const showRoutines = document.querySelector("#show-routines")
 const routineContainer = document.querySelector("#routine-container")
 const newRoutine = document.querySelector('#new-routine')
 const modal = document.querySelector('.modal')
+const editModal = document.querySelector('#edit-routines')
 const createRoutineForm = modal.querySelector(".new-routine-form")
 const exerciseList = document.querySelector('#exercise-list')
 const selectButton = document.querySelector('#exercise-select')
 const routineNameInput = document.querySelector('#create')
-const conatiner = document.querySelector(".container")
+const newRoutineNameInput = document.querySelector('#edit')
+const container = document.querySelector(".container")
 
 let exercises = []
 
@@ -34,7 +36,9 @@ renderRoutineList = json => {
     routineItem.className = "routine"
     routineItem.innerHTML = `
       <div class="card card-${routine.id}" data-id="${routine.id}">
-        <h3 class="card-header">${routine.name}</h3>
+        <h3 class="card-header">${routine.name}
+        <button type="button" class="btn btn-outline-dark open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
+        </h3>
         <div class="card-body"> 
           ${routine.exercises.map(exercise => {            
             return(`
@@ -62,6 +66,15 @@ renderRoutineList = json => {
       </div>
     `
     routineContainer.appendChild(routineItem)
+    
+    
+  
+    container.addEventListener('click', e => {
+      if (e.target.matches('.open-edit-modal')) {
+      editModal.dataset.id = e.target.closest(".card").dataset.id
+      }
+    })
+    
   })
 }
 
@@ -71,7 +84,9 @@ renderRoutine = routine => {
   newRoutineCard.classList = "routine"
   newRoutineCard.innerHTML = `
   <div class="card card-${routine.id}" data-id="${routine.id}">
-    <h3 class="card-header">${routine.name}</h3>
+    <h3 class="card-header">${routine.name}
+    <button type="button" class="btn btn-outline-dark open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
+    </h3>
       <div class="card-body">
         <form>
           <div class="input-group mb-3">
@@ -91,6 +106,12 @@ renderRoutine = routine => {
   </div>
   `
   routineContainer.append(newRoutineCard)
+  
+  const editModalBtn = document.querySelector('.open-edit-modal')
+  
+  editModalBtn.addEventListener('click', e => {
+  editModal.dataset.id = e.target.closest(".card").dataset.id
+  })
 }
 
 postRoutine = (name, callback) => {
@@ -111,10 +132,23 @@ deleteRoutine = id => {
     method: 'DELETE',
     headers: { "Content-Type": "application/json" }
   };
-  fetch(`${BASE_URL}/routines/${id}`, requestOptions)
+  fetch(`${BASE_URL}routines/${id}`, requestOptions)
     .then(result => console.log(result))
     .catch(error => console.log('error', error));
-    document.querySelector(`.card-${id}`).remove()
+    document.querySelector(`.card-${id}`).parentNode.remove()
+}
+
+
+patchRoutine = (id, name, callback) => {
+  var requestOptions = {
+    method: 'PATCH',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({"name":`${name}`})
+  };
+  fetch(`${BASE_URL}routines/${id}`, requestOptions)
+    .then(res => res.json())
+    .then(json => callback(json))
+    .catch(error => console.log('error', error));
 }
 
 addExerciseToRoutine = (routineId, exerciseId) => {
@@ -148,7 +182,17 @@ modal.addEventListener('click', e => {
   }
 })
 
-conatiner.addEventListener("click", e => {
+
+editModal.addEventListener('click', e => {
+  if (e.target.matches('#edit-routine')) {
+    let id = editModal.dataset.id
+    let newRoutineName = newRoutineNameInput.value
+    container.querySelector(`.card-${id}`).parentNode.remove()
+    patchRoutine(id, newRoutineName, renderRoutine)
+  }
+})
+
+container.addEventListener("click", e => {
   if (e.target.matches(".delete-btn")) {
     const id = e.target.closest(".card").dataset.id
     deleteRoutine(id)
@@ -163,3 +207,4 @@ conatiner.addEventListener("click", e => {
 
 
 getRoutines(renderRoutineList)
+
