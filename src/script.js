@@ -14,33 +14,28 @@ const container = document.querySelector(".container")
 
 let exercises = []
 
-getRoutines = callback => {
+const getRoutines = callback => {
   getExercises()
-
   fetch("http://localhost:3000/api/v1/routines")
     .then(res => res.json())
     .then(json => renderRoutineList(json))
     .catch(error => console.log('error', error));
 }
 
-getExercises = () => {
+const getExercises = () => {
   fetch("http://localhost:3000/api/v1/exercises")
     .then(res => res.json())
     .then(json => exercises = json)
     .catch(error => console.log('error', error));
 }
 
-renderRoutineList = json => {
-  json.forEach(routine => {
-    let routineItem = document.createElement('div')
-    routineItem.className = "routine"
-    routineItem.innerHTML = `
-      <div class="card card-${routine.id}" data-id="${routine.id}">
-        <h3 class="card-header">${routine.name}</h3>
-          <button type="button" class="btn btn-outline-primary btn-sm open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
-        <div class="card-body"><div>
-          ${routine.exercises.map(exercise => {            
-            return(`
+const routineCard = routine => {
+  return(`
+    <div class="card card-${routine.id}" data-id="${routine.id}">
+      <h3 class="card-header">${routine.name}</h3>
+      <div class="card-body"><div>
+        ${routine.exercises.map(exercise => {            
+          return(`
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">${exercise.name}</h5>
@@ -48,46 +43,8 @@ renderRoutineList = json => {
                 <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
               </div>
             </div>
-            `)
-          })}
-        </div>
-      <div class="card-footer">
-        <form>
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
-            </div>
-            <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
-              ${exercises.map(exercise => {
-                return `<option value="${exercise.id}">${exercise.name}</option>`
-              })}
-            </select>
-          </div>
-        </form>
-        <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
-      </div>  
-    </div>
-    `
-    routineContainer.appendChild(routineItem)
-    
-    container.addEventListener('click', e => {
-      if (e.target.matches('.open-edit-modal')) {
-      editModal.dataset.id = e.target.closest(".card").dataset.id
-      }
-    })
-    
-  })
-}
-
-renderRoutine = routine => {
-  routineNameInput.closest("form").reset()
-  const newRoutineCard = document.createElement('div')
-  newRoutineCard.classList = "routine"
-  newRoutineCard.innerHTML = `
-  <div class="card card-${routine.id}" data-id="${routine.id}">
-    <h3 class="card-header">${routine.name}</h3>
-      <button type="button" class="btn btn-outline-primary btn-sm open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
-      <div class="card-body">
+          `)
+        })}
       </div>
       <div class="card-footer">
         <form>
@@ -95,7 +52,6 @@ renderRoutine = routine => {
             <div class="input-group-prepend">
               <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
             </div>
-            
             <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
               ${exercises.map(exercise => {
                 return `<option value="${exercise.id}">${exercise.name}</option>`
@@ -103,25 +59,48 @@ renderRoutine = routine => {
             </select>
           </div>
         </form>
+        <button type="button" class="edit-title btn btn-outline-primary btn-sm open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
         <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
+      </div>  
     </div>
-  </div>
-  `
-  routineContainer.append(newRoutineCard)
-  
-  const editModalBtn = document.querySelector('.open-edit-modal')
-  
-  editModalBtn.addEventListener('click', e => {
-  editModal.dataset.id = e.target.closest(".card").dataset.id
+    `
+  )
+}
+
+const renderRoutineList = json => {
+  json.forEach(routine => {
+    let routineItem = document.createElement('div')
+    routineItem.className = "routine"
+    routineItem.innerHTML = routineCard(routine);
+    routineContainer.appendChild(routineItem)
+    container.addEventListener('click', e => {
+      if (e.target.matches('.open-edit-modal')) {
+        editModal.dataset.id = e.target.closest(".card").dataset.id
+      }
+    })
   })
 }
 
+const renderRoutine = routine => {
+  routineNameInput.closest("form").reset();
+  const newRoutineCard = document.createElement('div');
+  newRoutineCard.classList = "routine";
+  newRoutineCard.innerHTML = routineCard(routine);
+  routineContainer.append(newRoutineCard);
+  
+  const editModalBtn = document.querySelector('.open-edit-modal')
+  editModalBtn.addEventListener('click', e => {
+    editModal.dataset.id = e.target.closest(".card").dataset.id
+  })
+}
 
-postRoutine = (name, callback) => {
-  var requestOptions = {
+const postRoutine = (name, callback) => {
+  const requestOptions = {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({"name":`${name}`})
+    body: JSON.stringify({
+      "name": name
+    })
   };
   
   fetch(`${BASE_URL}/routines`, requestOptions)
@@ -130,8 +109,8 @@ postRoutine = (name, callback) => {
     .catch(error => console.log('error', error));
 }
 
-deleteRoutine = id => {
-  var requestOptions = {
+const deleteRoutine = id => {
+  const requestOptions = {
     method: 'DELETE',
     headers: { "Content-Type": "application/json" }
   };
@@ -141,8 +120,8 @@ deleteRoutine = id => {
     document.querySelector(`.card-${id}`).parentNode.remove()
 }
 
-patchRoutine = (id, name) => {
-  var requestOptions = {
+const patchRoutine = (id, name) => {
+  const requestOptions = {
     method: 'PATCH',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({"name":`${name}`})
@@ -153,8 +132,8 @@ patchRoutine = (id, name) => {
     .catch(error => console.log('error', error));
 }
 
-postExerciseToRoutine = (routineId, exerciseId, callback) => {
-  var requestOptions = {
+const postExerciseToRoutine = (routineId, exerciseId, callback) => {
+  const requestOptions = {
     method: 'POST',
     headers:{
       "Content-Type": "application/json"
@@ -175,9 +154,7 @@ postExerciseToRoutine = (routineId, exerciseId, callback) => {
     .catch(error => console.log('error', error));
 }
 
-renderExercise = (json) => {
-  console.log(exercises);
-  
+const renderExercise = json => {
   const card = container.querySelector(`.card-${json.routine_id}`)
   const exercises_container = card.querySelector(".card-body").firstElementChild
   exercises_container.innerHTML += `
@@ -189,7 +166,6 @@ renderExercise = (json) => {
       </div>
     </div>
   `
-  // card.querySelector().
 }
 
 
@@ -217,7 +193,6 @@ container.addEventListener("click", e => {
   } else if (e.target.matches("#exercise-select")) {
     const routine_id = e.target.closest(".card").dataset.id;
     const select_value = e.target.closest(".input-group-prepend").nextElementSibling.value;
-    console.log(select_value, routine_id);
     postExerciseToRoutine(routine_id, select_value, renderExercise);
   }
 })
