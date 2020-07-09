@@ -13,7 +13,10 @@ body {
   line-height: 3px;
 }
 
-.delete-btn {
+.delete-btn,.edit-title {
     width: 100%;
+}
+.edit-title {
+  margin-bottom: 15px;
 }
 
