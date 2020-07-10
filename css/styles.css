@@ -9,8 +9,26 @@ body {
   background-color: transparent;
 }
 
+#main {
+  /* margin-bottom: -5rem; */
+  margin-top: 2rem;
+  margin-bottom: 5rem;
+  margin-left: 10rem;
+  margin-right: 10rem;
+  background-color: rgba(0, 179, 255, 0.18);
+  height: 5rem;
+}
+
+.routine-container {
+  margin-top: 1rem;
+}
+
 .card {
   background-color: rgba(238, 130, 238, 0.434);
+}
+
+#routine-container {
+  margin-top: 5rem;
 }
 
 .card-header {
@@ -39,14 +57,28 @@ body {
   margin: auto;
 }
 
+.create-btn {
+  color: rgba(149, 255, 0, 0.92);
+}
+
 .delete-btn {
   width: 100%;
+}
+
+.delete-exercise-button {
+  color: rgba(235, 228, 8, 0.708);
+  border-width: 2px;
+}
+
+#exercise-select {
+  color: rgba(149, 255, 0, 0.92);
+}
+
+.edit-title {
+
 }
 
 .edit-title {
   width: 100%;
   margin-bottom: 15px;
 }
-
-
-

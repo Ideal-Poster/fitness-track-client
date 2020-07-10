@@ -19,7 +19,15 @@ const getRoutines = callback => {
   getExercises()
   fetch("http://localhost:3000/api/v1/routines")
     .then(res => res.json())
-    .then(json => renderRoutineList(json))
+    .then(json => {
+      json.forEach((routine) => {
+        routine.exercises.map((exercise, i) => {
+          exercise.joinId = routine.exercise_routines[i].id
+        })
+        console.log(json);
+      })
+      renderRoutineList(json)
+    })
     .catch(error => console.log('error', error));
 }
 
@@ -30,43 +38,42 @@ const getExercises = () => {
     .catch(error => console.log('error', error));
 }
 
+const renderExerciseCard = (exercise) => {
+  return(`
+    <div data-join-id="${exercise.joinId}" class="card exercise-card">
+      <div class="card-body">
+        <h5 class="card-title">${exercise.name}</h5>
+        <p class="card-text">muscle group: ${exercise.muscle_group}</p>
+        <button type="button" class="delete-exercise-button btn btn-outline-danger">Delete exercise</button>
+      </div>
+    </div>
+  `)
+}
+
 const routineCard = routine => {
   return(`
     <div class="card card-${routine.id}" data-id="${routine.id}">
       <h3 class="card-header">${routine.name}</h3>
       <div class="card-body"><div>
-        ${routine.exercises.map(exercise => {            
-          return(`
-            <div class="card">
-              <div class="card-body routine-item">
-                <a class="delete-item secondary-content">
-                  <i class="fa fa-remove remove"></i>
-                </a>
-                <h5 class="card-title">${exercise.name}</h5>
-                <p class="card-text">muscle group: ${exercise.muscle_group}</p>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-              </div>
-            </div>
-          `)
-        })}
+        ${routine.exercises.map(exercise => renderExerciseCard(exercise)).join(' ')}
       </div>
-      <div class="card-footer">
-        <form>
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <button class="btn btn-secondary" id="exercise-select" type="button">Select</button>
+        <div class="card-footer">
+          <form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <button class="btn btn-secondary" id="exercise-select" type="button">Select</button>
+              </div>
+              <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
+                ${exercises.map(exercise => {
+                  return `<option value="${exercise.id}">${exercise.name}</option>`
+                })}
+              </select>
             </div>
-            <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
-              ${exercises.map(exercise => {
-                return `<option value="${exercise.id}">${exercise.name}</option>`
-              })}
-            </select>
-          </div>
-        </form>
-        <button type="button" class="edit-title btn btn-primary open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
-        <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
-      </div>  
-    </div>
+          </form>
+          <button type="button" class="edit-title btn btn-primary open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
+          <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
+        </div>  
+      </div>
     `
   )
 }
@@ -152,29 +159,30 @@ const postExerciseToRoutine = (routineId, exerciseId, callback) => {
     .then(res => res.json())
     .then(json => {
       console.log(json);
-      
+        json.exercises = []
+        json.name = json.exercise.name
+        json.joinId = json.id
       callback(json)
     })
     .catch(error => console.log('error', error));
 }
 
 const renderExercise = json => {
-  const card = container.querySelector(`.card-${json.routine_id}`)
-  const exercises_container = card.querySelector(".card-body").firstElementChild
-  exercises_container.innerHTML += `
-    <div class="card">
-      <div class="card-body routine-item">
-        <a class="delete-item secondary-content">
-          <i class="fa fa-remove remove"></i>
-        </a>
-        <h5 class="card-title">${exercises[json.exercise_id - 1].name}</h5>
-        <p class="card-text">muscle group: ${exercises[json.exercise_id - 1].muscle_group}</p>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      </div>
-    </div>
-  `
+  json.muscle_group = json.exercise.muscle_group;
+  const card = container.querySelector(`.card-${json.routine_id}`);
+  const exercises_container = card.querySelector(".card-body").firstElementChild;
+  exercises_container.innerHTML += renderExerciseCard(json);
 }
 
+const deleteExercise = id => {
+  const requestOptions = {
+    method: 'DELETE',
+  };
+
+fetch(`http://localhost:3000/api/v1/exercise_routines/${id}`, requestOptions)
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+}
 
 modal.addEventListener('click', e => {
   if (e.target.matches('#new-routine')) {
@@ -209,6 +217,11 @@ container.addEventListener("click", e => {
     const routine_id = e.target.closest(".card").dataset.id;
     const select_value = e.target.closest(".input-group-prepend").nextElementSibling.value;
     postExerciseToRoutine(routine_id, select_value, renderExercise);
+  } else if (e.target.matches(".delete-exercise-button")) {
+    const card = e.target.closest(".exercise-card")
+    console.log(card.dataset.joinId);
+    deleteExercise(card.dataset.joinId);
+    card.remove();
   }
 })
 
