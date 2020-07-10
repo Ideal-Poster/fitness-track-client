@@ -20,3 +20,16 @@ body {
   margin-bottom: 15px;
 }
 
+/* .delete-exercise-button {
+  width: 200px;
+  position: absolute;
+  transform: translateY(50%);
+  bottom: 50%;
+  right: 0;
+  margin-right: 20px;
+} */
+
+.card-body { 
+  line-height: 20px;
+}
+

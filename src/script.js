@@ -18,7 +18,14 @@ const getRoutines = callback => {
   getExercises()
   fetch("http://localhost:3000/api/v1/routines")
     .then(res => res.json())
-    .then(json => renderRoutineList(json))
+    .then(json => {
+      json.forEach((routine) => {
+        routine.exercises.map((exercise, i) => {
+          exercise.join_id = routine.exercise_routines[i].id
+        })
+      })
+      renderRoutineList(json)
+    })
     .catch(error => console.log('error', error));
 }
 
@@ -29,40 +36,42 @@ const getExercises = () => {
     .catch(error => console.log('error', error));
 }
 
+const renderExerciseCard = (exercise) => {
+  return(`
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">${exercise.name}</h5>
+      <p class="card-text">muscle group: ${exercise.muscle_group}</p>
+      <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    </div>
+  </div>
+`)
+}
+
 const routineCard = routine => {
   return(`
     <div class="card card-${routine.id}" data-id="${routine.id}">
       <h3 class="card-header">${routine.name}</h3>
       <div class="card-body"><div>
-        ${routine.exercises.map(exercise => {            
-          return(`
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">${exercise.name}</h5>
-                <p class="card-text">muscle group: ${exercise.muscle_group}</p>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-              </div>
-            </div>
-          `)
-        })}
+        ${routine.exercises.map(exercise => renderExerciseCard(exercise)).join(' ')}
       </div>
-      <div class="card-footer">
-        <form>
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
+        <div class="card-footer">
+          <form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
+              </div>
+              <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
+                ${exercises.map(exercise => {
+                  return `<option value="${exercise.id}">${exercise.name}</option>`
+                })}
+              </select>
             </div>
-            <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
-              ${exercises.map(exercise => {
-                return `<option value="${exercise.id}">${exercise.name}</option>`
-              })}
-            </select>
-          </div>
-        </form>
-        <button type="button" class="edit-title btn btn-outline-primary btn-sm open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
-        <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
-      </div>  
-    </div>
+          </form>
+          <button type="button" class="edit-title btn btn-outline-primary btn-sm open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
+          <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
+        </div>  
+      </div>
     `
   )
 }
@@ -148,24 +157,17 @@ const postExerciseToRoutine = (routineId, exerciseId, callback) => {
     .then(res => res.json())
     .then(json => {
       console.log(json);
-      
+        json.exercises = []
+        json.name = json.exercise.name
       callback(json)
     })
     .catch(error => console.log('error', error));
 }
 
 const renderExercise = json => {
-  const card = container.querySelector(`.card-${json.routine_id}`)
-  const exercises_container = card.querySelector(".card-body").firstElementChild
-  exercises_container.innerHTML += `
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">${exercises[json.exercise_id - 1].name}</h5>
-        <p class="card-text">muscle group: ${exercises[json.exercise_id - 1].muscle_group}</p>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      </div>
-    </div>
-  `
+  const card = container.querySelector(`.card-${json.routine_id}`);
+  const exercises_container = card.querySelector(".card-body").firstElementChild;
+  exercises_container.innerHTML += renderExerciseCard(json);
 }
 
 
