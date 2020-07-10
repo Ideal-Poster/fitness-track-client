@@ -13,20 +13,33 @@ body {
   background-color: rgba(238, 130, 238, 0.434);
 }
 
+.card-header {
+  color: aliceblue;
+}
+
+.routine-item {
+  background-color: rgba(128, 255, 0, 0.406);
+}
+
 .card-content {
   padding: 1rem;
 }
 
 .routine {
-  border: black;
   padding-top: 1rem;
   line-height: 3px;
 }
 
-.delete-btn,.edit-title {
-    width: 100%;
+#crt-btn {
+  margin: auto;
 }
+
+.delete-btn {
+  width: 100%;
+}
+
 .edit-title {
+  width: 100%;
   margin-bottom: 15px;
 }
 

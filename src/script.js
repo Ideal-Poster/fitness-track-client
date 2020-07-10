@@ -37,7 +37,7 @@ const routineCard = routine => {
         ${routine.exercises.map(exercise => {            
           return(`
             <div class="card">
-              <div class="card-body">
+              <div class="card-body routine-item">
                 <h5 class="card-title">${exercise.name}</h5>
                 <p class="card-text">muscle group: ${exercise.muscle_group}</p>
                 <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
@@ -50,7 +50,7 @@ const routineCard = routine => {
         <form>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
-              <button class="btn btn-outline-secondary" id="exercise-select" type="button">Select</button>
+              <button class="btn btn-secondary" id="exercise-select" type="button">Select</button>
             </div>
             <select class="custom-select" id="exercise-list" placeholder="Exercises" aria-label="Example select with button addon">
               ${exercises.map(exercise => {
@@ -59,7 +59,7 @@ const routineCard = routine => {
             </select>
           </div>
         </form>
-        <button type="button" class="edit-title btn btn-outline-primary btn-sm open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
+        <button type="button" class="edit-title btn btn-primary open-edit-modal" data-toggle="modal" data-target="#edit-routines">Edit Title</button>
         <button type="button" class="delete-btn btn btn-danger">Delete Routine</button>
       </div>  
     </div>
