@@ -21,8 +21,9 @@ const getRoutines = callback => {
     .then(json => {
       json.forEach((routine) => {
         routine.exercises.map((exercise, i) => {
-          exercise.join_id = routine.exercise_routines[i].id
+          exercise.joinId = routine.exercise_routines[i].id
         })
+        console.log(json);
       })
       renderRoutineList(json)
     })
@@ -38,14 +39,14 @@ const getExercises = () => {
 
 const renderExerciseCard = (exercise) => {
   return(`
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">${exercise.name}</h5>
-      <p class="card-text">muscle group: ${exercise.muscle_group}</p>
-      <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <div data-join-id="${exercise.joinId}" class="card exercise-card">
+      <div class="card-body">
+        <h5 class="card-title">${exercise.name}</h5>
+        <p class="card-text">muscle group: ${exercise.muscle_group}</p>
+        <button type="button" class="delete-exercise-button btn btn-outline-danger">Delete exercise</button>
+      </div>
     </div>
-  </div>
-`)
+  `)
 }
 
 const routineCard = routine => {
@@ -159,17 +160,28 @@ const postExerciseToRoutine = (routineId, exerciseId, callback) => {
       console.log(json);
         json.exercises = []
         json.name = json.exercise.name
+        json.joinId = json.id
       callback(json)
     })
     .catch(error => console.log('error', error));
 }
 
 const renderExercise = json => {
+  json.muscle_group = json.exercise.muscle_group;
   const card = container.querySelector(`.card-${json.routine_id}`);
   const exercises_container = card.querySelector(".card-body").firstElementChild;
   exercises_container.innerHTML += renderExerciseCard(json);
 }
 
+const deleteExercise = id => {
+  const requestOptions = {
+    method: 'DELETE',
+  };
+
+fetch(`http://localhost:3000/api/v1/exercise_routines/${id}`, requestOptions)
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+}
 
 modal.addEventListener('click', e => {
   if (e.target.matches('#new-routine')) {
@@ -196,6 +208,11 @@ container.addEventListener("click", e => {
     const routine_id = e.target.closest(".card").dataset.id;
     const select_value = e.target.closest(".input-group-prepend").nextElementSibling.value;
     postExerciseToRoutine(routine_id, select_value, renderExercise);
+  } else if (e.target.matches(".delete-exercise-button")) {
+    const card = e.target.closest(".exercise-card")
+    console.log(card.dataset.joinId);
+    deleteExercise(card.dataset.joinId);
+    card.remove();
   }
 })
 
