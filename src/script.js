@@ -12,6 +12,7 @@ const routineNameInput = document.querySelector('#create')
 const newRoutineNameInput = document.querySelector('#edit')
 const container = document.querySelector(".container")
 
+
 let exercises = []
 
 const getRoutines = callback => {
@@ -38,6 +39,9 @@ const routineCard = routine => {
           return(`
             <div class="card">
               <div class="card-body routine-item">
+                <a class="delete-item secondary-content">
+                  <i class="fa fa-remove remove"></i>
+                </a>
                 <h5 class="card-title">${exercise.name}</h5>
                 <p class="card-text">muscle group: ${exercise.muscle_group}</p>
                 <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
@@ -159,7 +163,10 @@ const renderExercise = json => {
   const exercises_container = card.querySelector(".card-body").firstElementChild
   exercises_container.innerHTML += `
     <div class="card">
-      <div class="card-body">
+      <div class="card-body routine-item">
+        <a class="delete-item secondary-content">
+          <i class="fa fa-remove remove"></i>
+        </a>
         <h5 class="card-title">${exercises[json.exercise_id - 1].name}</h5>
         <p class="card-text">muscle group: ${exercises[json.exercise_id - 1].muscle_group}</p>
         <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
@@ -176,6 +183,7 @@ modal.addEventListener('click', e => {
   }
 })
 
+
 editModal.addEventListener('click', e => {
   if (e.target.matches('#edit-routine')) {
     let id = editModal.dataset.id
@@ -185,6 +193,13 @@ editModal.addEventListener('click', e => {
     patchRoutine(id, newRoutineName)
   }
 })
+
+ routineContainer.addEventListener('click', e => {
+    if (e.target.matches(".remove")) {
+      const exerciseTarget = e.target.parentNode.parentNode.parentNode
+      exerciseTarget.remove()
+    }
+  })
 
 container.addEventListener("click", e => {
   if (e.target.matches(".delete-btn")) {

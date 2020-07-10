@@ -17,6 +17,11 @@ body {
   color: aliceblue;
 }
 
+.delete-item {
+  position: absolute;
+  right: 20px;
+}
+
 .routine-item {
   background-color: rgba(128, 255, 0, 0.406);
 }
